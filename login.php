@@ -19,8 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'email' => $user['email'],
                 'is_admin' => (int)$user['is_admin']
             ];
-            header("Location: index.php");
-            exit();
+            if ($_SESSION['user']['is_admin'] == 1) {
+                header("Location: admin_dashboard.php");
+                exit();
+            } else {
+                header("Location: index.php");
+                exit();
+            }
         } else {
             $error = "Invalid credentials.";
         }
