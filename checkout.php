@@ -61,6 +61,16 @@ if (empty($_SESSION['cart'])) {
       </div>
     </div>
   </div>
+
+  <div class="card my-4">
+    <div class="card-body text-center">
+      <h5 class="mb-3">Scan to Pay</h5>
+      <img src="images/payment_qr.jpg" alt="QR Code for Payment" class="mb-3" style="width:250px;height:250px;">
+      <p class="mb-0">Scan this QR code with your UPI app to pay.<br>
+        <strong>UPI ID:</strong> kalaisidharth212@okicici
+      </p>
+    </div>
+  </div>
 </div>
 
 </body>

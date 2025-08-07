@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email    = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role     = $_POST['role']; // either "user" or "admin"
+    $is_admin = ($role === 'admin') ? 1 : 0; // Set is_admin based on role
 
     // Check if email already exists
     $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
@@ -28,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($check->num_rows > 0) {
         $msg = "Email already exists!";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $name, $email, $password, $role);
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, is_admin) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssi", $name, $email, $password, $role, $is_admin);
         if ($stmt->execute()) {
             $msg = "Registration successful. <a href='login.php'>Login here</a>.";
         } else {

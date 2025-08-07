@@ -11,29 +11,26 @@ if (!isset($_SESSION['user'])) {
  * ADD TO CART
  */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_to_cart') {
-    $id  = (int)$_POST['product_id'];
-    $qty = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-    $qty = max(1, $qty);
+    $product_id = intval($_POST['product_id']);
+    $quantity = intval($_POST['quantity']);
 
-    // Validate stock
-    $res = $conn->query("SELECT stock FROM products WHERE id = $id");
-    if ($res && $res->num_rows) {
-        $stock = (int)$res->fetch_assoc()['stock'];
-        if ($stock <= 0) {
-            $_SESSION['message'] = "Item is out of stock!";
-            header("Location: index.php");
-            exit();
-        }
-        if ($qty > $stock) $qty = $stock;
+    // Get product stock
+    $stmt = $conn->prepare("SELECT stock FROM products WHERE id=?");
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $stmt->bind_result($stock);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Cap quantity at stock
+    if ($quantity > $stock) {
+        $quantity = $stock;
     }
 
-    if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
+    // Add to cart logic here (session/cart array)
+    $_SESSION['cart'][$product_id] = $quantity;
 
-    $_SESSION['cart'][$id] = ($_SESSION['cart'][$id] ?? 0) + $qty;
-    // Cap by stock
-    if (isset($stock)) {
-        $_SESSION['cart'][$id] = min($_SESSION['cart'][$id], $stock);
-    }
+    // Set success message
     $_SESSION['message'] = "Item added to cart!";
     header("Location: index.php");
     exit();
